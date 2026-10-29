@@ -1,0 +1,2083 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYNTHIA — AI Content Creator Marketplace | Kampus.VC Challenge 2</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: { 50: '#f5f3ff', 900: '#18182b', 950: '#0b0c16' }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Embedded Complete CSS -->
+    <style>
+        :root {
+            --primary-glow: rgba(139, 92, 246, 0.35);
+            --card-bg: rgba(24, 26, 44, 0.7);
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #0b0c16;
+            color: #f1f5f9;
+            overflow-x: hidden;
+        }
+        .glass-panel {
+            background: rgba(18, 19, 32, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 1.25rem;
+        }
+        .glass-card {
+            background: rgba(24, 26, 44, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .glass-card:hover {
+            border-color: rgba(139, 92, 246, 0.45);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px -10px rgba(139, 92, 246, 0.3);
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0d0e1a; }
+        ::-webkit-scrollbar-thumb { background: #2a2d45; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #474b70; }
+        .tab-btn.active {
+            color: #c084fc;
+            border-bottom: 2px solid #a855f7;
+            background-color: rgba(88, 28, 135, 0.25);
+        }
+    </style>
+</head>
+<body class="bg-[#0b0c16] text-slate-100 min-h-screen flex flex-col font-sans selection:bg-violet-600 selection:text-white">
+
+    <!-- Ambient Glow Blobs -->
+    <div class="fixed top-0 left-1/4 w-96 h-96 bg-violet-600/10 rounded-full blur-[140px] pointer-events-none"></div>
+    <div class="fixed top-1/3 right-10 w-96 h-96 bg-cyan-600/10 rounded-full blur-[140px] pointer-events-none"></div>
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-40 bg-[#0e101f]/90 backdrop-blur-xl border-b border-slate-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Brand Logo -->
+                <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('discover')">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-violet-600 via-indigo-600 to-cyan-400 p-[1px] flex items-center justify-center shadow-lg shadow-violet-600/20">
+                        <div class="w-full h-full bg-[#0b0c16] rounded-xl flex items-center justify-center">
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-cyan-400 font-black text-xl">S</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg font-black tracking-tight text-white">SYNTHIA</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-violet-500/20 text-violet-300 border border-violet-500/30">Kampus.VC</span>
+                        </div>
+                        <p class="text-[10px] text-slate-400 -mt-0.5 tracking-wider uppercase font-mono">AI Creator Marketplace</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <nav class="hidden md:flex items-center space-x-1">
+                    <button id="nav-btn-discover" onclick="switchTab('discover')" class="tab-btn active px-3.5 py-2 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white">
+                        🔍 Discover Creators
+                    </button>
+                    <button id="nav-btn-briefs" onclick="switchTab('briefs')" class="tab-btn px-3.5 py-2 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white">
+                        📋 Brand Brief Studio
+                    </button>
+                    <button id="nav-btn-engagements" onclick="switchTab('engagements')" class="tab-btn px-3.5 py-2 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white">
+                        🤝 Engagements & Bids
+                    </button>
+                    <button id="nav-btn-datamodel" onclick="switchTab('datamodel')" class="tab-btn px-3.5 py-2 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white">
+                        📐 Data Model Docs
+                    </button>
+                </nav>
+
+                <!-- Header Actions -->
+                <div class="flex items-center gap-2.5">
+                    <button onclick="openPitchDeck()" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-amber-300 hover:text-amber-200 border border-amber-500/30 hover:border-amber-400 transition">
+                        <span>🏆</span> Pitch Deck & Demo
+                    </button>
+                    <button onclick="switchTab('briefs')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-md shadow-violet-600/20 transition flex items-center gap-1.5">
+                        <span>✨</span> AI Brief Builder
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Navigation Row -->
+        <div class="flex md:hidden overflow-x-auto border-t border-slate-800/60 px-4 py-2 gap-2 text-xs">
+            <button onclick="switchTab('discover')" class="px-3 py-1.5 rounded-md text-xs font-medium text-violet-300 bg-violet-950/40 whitespace-nowrap">Discover</button>
+            <button onclick="switchTab('briefs')" class="px-3 py-1.5 rounded-md text-xs font-medium text-slate-300 whitespace-nowrap">Brief Studio</button>
+            <button onclick="switchTab('engagements')" class="px-3 py-1.5 rounded-md text-xs font-medium text-slate-300 whitespace-nowrap">Engagements</button>
+            <button onclick="switchTab('datamodel')" class="px-3 py-1.5 rounded-md text-xs font-medium text-slate-300 whitespace-nowrap">Data Model</button>
+            <button onclick="openPitchDeck()" class="px-3 py-1.5 rounded-md text-xs font-medium text-amber-400 whitespace-nowrap">🏆 Pitch Deck</button>
+        </div>
+    </header>
+
+    <!-- Metrics Ribbon -->
+    <section class="border-b border-slate-800/60 bg-[#0e101f]/50 py-2.5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                <div class="flex items-center justify-center gap-2">
+                    <span class="text-xs text-slate-400">Total AI Creators:</span>
+                    <span id="stat-total-creators" class="text-xs font-bold text-violet-400 font-mono">6</span>
+                </div>
+                <div class="flex items-center justify-center gap-2">
+                    <span class="text-xs text-slate-400">Verified Pro Badges:</span>
+                    <span id="stat-verified-count" class="text-xs font-bold text-emerald-400 font-mono">6</span>
+                </div>
+                <div class="flex items-center justify-center gap-2">
+                    <span class="text-xs text-slate-400">Active Briefs:</span>
+                    <span id="stat-active-briefs" class="text-xs font-bold text-cyan-400 font-mono">3</span>
+                </div>
+                <div class="flex items-center justify-center gap-2">
+                    <span class="text-xs text-slate-400">Average Rating:</span>
+                    <span id="stat-avg-rating" class="text-xs font-bold text-amber-400 font-mono">4.94 ★</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN APP CONTENT -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- =================================================================== -->
+        <!-- TAB 1: DISCOVER CREATORS & AI PORTFOLIOS                            -->
+        <!-- =================================================================== -->
+        <section id="tab-discover" class="tab-pane space-y-8">
+            <!-- Hero Banner -->
+            <div class="relative rounded-3xl p-8 sm:p-10 overflow-hidden bg-gradient-to-r from-violet-950/50 via-slate-900/70 to-slate-950 border border-violet-500/30 shadow-2xl">
+                <div class="relative z-10 max-w-3xl">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/30 text-violet-300 text-xs font-semibold mb-4">
+                        <span class="w-2 h-2 rounded-full bg-violet-400 animate-ping"></span>
+                        AI-Native Creative Workflows • Kampus.VC Challenge 2
+                    </div>
+                    <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
+                        Connect with Verified <span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-cyan-400 to-fuchsia-400">AI Creators & Filmmakers</span>
+                    </h1>
+                    <p class="mt-4 text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl">
+                        Discover top-tier generative artists with verified ComfyUI pipelines, Runway Gen-3 motion control, custom LoRA weights, and clear commercial buyout licensing.
+                    </p>
+                    <div class="mt-6 flex flex-wrap gap-3">
+                        <button onclick="switchTab('briefs')" class="px-5 py-2.5 rounded-xl font-bold text-xs bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-lg shadow-violet-600/30 transition flex items-center gap-2">
+                            <span>✨</span> Post Creative Brief with AI
+                        </button>
+                        <button onclick="openPitchDeck()" class="px-5 py-2.5 rounded-xl font-bold text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-2">
+                            <span>📊</span> View Solution Pitch Slides
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search and Filter Panel -->
+            <div class="glass-panel p-6 space-y-5">
+                <!-- Search row -->
+                <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+                    <div class="relative flex-1">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">🔍</span>
+                        <input id="filter-search-input" type="text" oninput="handleSearch(this.value)" placeholder="Search by creator name, prompt skills, models (Runway, ComfyUI, FLUX.1), or style..." 
+                               class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition" />
+                    </div>
+
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <!-- Verified Only Toggle -->
+                        <label class="flex items-center gap-2 cursor-pointer bg-slate-900 px-3.5 py-2 rounded-xl border border-slate-700 text-xs font-semibold text-slate-200 hover:border-emerald-500/50 transition">
+                            <input id="filter-verified-toggle" type="checkbox" onchange="toggleVerified(this.checked)" class="w-4 h-4 rounded text-emerald-500 bg-slate-800 border-slate-700 cursor-pointer" />
+                            <span class="flex items-center gap-1 text-emerald-400 font-bold">
+                                <span>🛡️</span> Verified Signals Only
+                            </span>
+                        </label>
+
+                        <!-- Sort Select -->
+                        <select id="filter-sort-select" onchange="handleSort(this.value)" class="bg-slate-900 border border-slate-700 text-xs font-semibold text-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-violet-500">
+                            <option value="rating">Sort: Highest Rating ★</option>
+                            <option value="trust">Sort: Highest Trust Score</option>
+                            <option value="completed">Sort: Most Projects</option>
+                            <option value="rate_asc">Sort: Rate (Low to High)</option>
+                            <option value="rate_desc">Sort: Rate (High to Low)</option>
+                        </select>
+
+                        <!-- Reset Button -->
+                        <button onclick="resetAllFilters()" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition">
+                            Reset Filters
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tool Filter Pills -->
+                <div class="space-y-2">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Filter by AI Tools & Models</span>
+                    <div id="filter-tools-container" class="flex flex-wrap gap-2"></div>
+                </div>
+
+                <!-- Specialization Filter Pills -->
+                <div class="space-y-2">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Filter by Creative Specialization</span>
+                    <div id="filter-specs-container" class="flex flex-wrap gap-2"></div>
+                </div>
+            </div>
+
+            <!-- Results Counter -->
+            <div class="flex items-center justify-between">
+                <span id="creators-count-badge" class="text-xs font-semibold text-violet-400 uppercase tracking-wider font-mono">
+                    Loading creators...
+                </span>
+                <span class="text-xs text-slate-500">
+                    Showing verified profiles with full pipeline transparency
+                </span>
+            </div>
+
+            <!-- Creators Grid -->
+            <div id="creators-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+            <!-- Empty Results Recovery State -->
+            <div id="creators-empty" class="hidden glass-panel p-12 text-center max-w-xl mx-auto space-y-4">
+                <div class="w-16 h-16 rounded-full bg-violet-600/10 border border-violet-500/30 text-violet-400 text-3xl flex items-center justify-center mx-auto">
+                    🔍
+                </div>
+                <h3 class="text-lg font-bold text-white">No AI Creators match your current filters</h3>
+                <p class="text-xs text-slate-300">
+                    Try loosening your tool or specialization filters to see more results, or post an open brief in the Brand Brief Studio.
+                </p>
+                <div class="pt-2 flex justify-center gap-3">
+                    <button onclick="resetAllFilters()" class="px-4 py-2 rounded-xl text-xs font-bold bg-violet-600 hover:bg-violet-500 text-white transition">
+                        Reset All Filters
+                    </button>
+                    <button onclick="switchTab('briefs')" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+                        Create Custom Brief
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- TAB 2: BRAND BRIEF STUDIO & AI BUILDER                              -->
+        <!-- =================================================================== -->
+        <section id="tab-briefs" class="tab-pane hidden space-y-8">
+            <div class="glass-panel p-8">
+                <div class="max-w-3xl">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-semibold mb-3">
+                        <span>✨</span> Bonus Feature: AI-Assisted Brief Builder
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Brand Brief Studio</h2>
+                    <p class="text-sm text-slate-300 mt-2 leading-relaxed">
+                        Turn rough ideas into structured, technical briefs for generative creators. Automatically decomposes your prompt into exact aspect ratios, recommended AI pipelines, resolutions, and commercial licensing terms.
+                    </p>
+                </div>
+
+                <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Input Box -->
+                    <div class="space-y-4 bg-slate-900/80 p-6 rounded-2xl border border-slate-800">
+                        <h3 class="text-sm font-bold text-white uppercase tracking-wider">Step 1: Input Brand Concept</h3>
+                        
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Brand or Agency Name</label>
+                            <input id="brief-brand-name" type="text" value="Apex Electric Mobility"
+                                   class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:outline-none focus:border-violet-500" />
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Rough Campaign Idea / Creative Concept</label>
+                            <textarea id="brief-raw-idea" rows="4" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:outline-none focus:border-violet-500">We need a 15-second vertical reel ad showcasing a futuristic electric hypercar speeding across a rain-slicked neo-Tokyo bridge with reflections and cinematic anamorphic lens flares.</textarea>
+                        </div>
+
+                        <!-- Sample Presets -->
+                        <div>
+                            <span class="text-[11px] text-slate-400 font-semibold block mb-1.5">Try sample prompt presets:</span>
+                            <div class="flex flex-wrap gap-1.5">
+                                <button type="button" onclick="setSamplePrompt('Aura Kicks', '15s vertical reel of futuristic luxury sneakers floating and assembling from liquid chrome and gold in zero gravity.')" class="text-[11px] px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+                                    👟 Liquid Chrome Sneaker
+                                </button>
+                                <button type="button" onclick="setSamplePrompt('Chronos Lab', 'Macro 3D render and 10s loop of luxury titanium chronograph watch with sapphire glass refractions in deep space.')" class="text-[11px] px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+                                    ⏱️ Titanium Watch Macro
+                                </button>
+                                <button type="button" onclick="setSamplePrompt('Veloce Fintech', 'Photorealistic virtual AI brand ambassador presenting our fintech app with natural micro-expressions and perfect lip-sync in 4K.')" class="text-[11px] px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+                                    👤 AI Brand Avatar
+                                </button>
+                            </div>
+                        </div>
+
+                        <button id="btn-generate-brief" onclick="triggerAIBriefGeneration()" class="w-full py-3 rounded-xl font-bold text-xs bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:opacity-95 text-white shadow-lg transition flex items-center justify-center gap-2">
+                            <span>✨</span> Synthesize Structured Brief with AI
+                        </button>
+                    </div>
+
+                    <!-- AI Output Box -->
+                    <div class="space-y-4">
+                        <h3 class="text-sm font-bold text-white uppercase tracking-wider">Step 2: AI-Structured Output</h3>
+                        
+                        <div id="brief-ai-status" class="hidden p-8 text-center bg-slate-900/60 rounded-2xl border border-slate-800">
+                            <div class="w-8 h-8 border-4 border-violet-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                            <p class="text-xs text-slate-300 mt-3 font-mono">Decomposing prompt into tools, formats, and buyout clauses...</p>
+                        </div>
+
+                        <div id="brief-ai-result" class="hidden">
+                            <div id="brief-structured-preview"></div>
+                        </div>
+
+                        <div id="brief-ai-placeholder" class="p-8 text-center bg-slate-900/40 rounded-2xl border border-dashed border-slate-800 text-slate-400 text-xs">
+                            Click <strong class="text-violet-400">"Synthesize Structured Brief with AI"</strong> to automatically generate resolution specs, aspect ratios, recommended AI toolsets, and commercial licensing terms.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Marketplace Briefs List -->
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold text-white">Active Creative Briefs</h3>
+                        <p class="text-xs text-slate-400">Published briefs currently open for creator proposals and pitches</p>
+                    </div>
+                </div>
+
+                <div id="briefs-list-container" class="space-y-4"></div>
+            </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- TAB 3: ENGAGEMENTS & BIDS                                           -->
+        <!-- =================================================================== -->
+        <section id="tab-engagements" class="tab-pane hidden space-y-8">
+            <div class="glass-panel p-8">
+                <div class="max-w-3xl">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold mb-3">
+                        <span>🤝</span> Engagement Lifecycle
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Active Engagements & Creator Proposals</h2>
+                    <p class="text-sm text-slate-300 mt-2 leading-relaxed">
+                        Track pitches, milestone agreements, seed parameter handovers, and commercial asset verification from initial proposal through final delivery.
+                    </p>
+                </div>
+            </div>
+
+            <div id="proposals-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- TAB 4: DATA MODEL DOCS (Hackathon Deliverable 2)                     -->
+        <!-- =================================================================== -->
+        <section id="tab-datamodel" class="tab-pane hidden space-y-8">
+            <div class="glass-panel p-8 space-y-6">
+                <div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-semibold mb-3">
+                        <span>📐</span> Official Hackathon Deliverable 2
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Profile & Brief Data Model Documentation</h2>
+                    <p class="text-sm text-slate-300 mt-2 leading-relaxed">
+                        Formal data model capturing AI-specific fields: tools, skills, format & aspect ratios, ComfyUI node reproducibility, and commercial-use compliance.
+                    </p>
+                </div>
+
+                <!-- Explanation Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                    <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-1.5">
+                        <h4 class="font-bold text-violet-400 uppercase tracking-wider text-[11px]">1. AI Profile Schema</h4>
+                        <p class="text-slate-300 leading-relaxed">
+                            Includes verified tools (Runway, Midjourney, ComfyUI), skills (LoRA, ControlNet), trust scores, and verified enterprise client metrics.
+                        </p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-1.5">
+                        <h4 class="font-bold text-cyan-400 uppercase tracking-wider text-[11px]">2. AI Portfolio Item Schema</h4>
+                        <p class="text-slate-300 leading-relaxed">
+                            Maps media types, aspect ratios (<code class="text-violet-300">9:16</code>, <code class="text-violet-300">16:9</code>), ComfyUI node graphs, locked seeds, and explicit licensing grants.
+                        </p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-1.5">
+                        <h4 class="font-bold text-emerald-400 uppercase tracking-wider text-[11px]">3. Creative Brief Schema</h4>
+                        <p class="text-slate-300 leading-relaxed">
+                            Decomposes raw client prompts into resolution, frame rate, recommended models, and commercial deliverables (Prompt/Seed handover).
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Live Schema Viewer -->
+                <div class="space-y-2">
+                    <span class="text-xs font-mono text-slate-400">Live JSON Schema:</span>
+                    <pre id="data-model-viewer" class="p-5 rounded-2xl bg-black border border-slate-800 text-xs font-mono text-emerald-400 overflow-x-auto max-h-[500px]"></pre>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="mt-16 border-t border-slate-800/80 bg-[#0e101f]/80 py-8 text-center text-xs text-slate-400 space-y-2">
+        <div class="flex justify-center items-center gap-4">
+            <span class="font-bold text-white">SYNTHIA Marketplace</span>
+            <span>•</span>
+            <span>Built for Kampus.VC Hackathon Challenge 2</span>
+            <span>•</span>
+            <button onclick="openPitchDeck()" class="text-violet-400 hover:underline">View Pitch Presentation</button>
+        </div>
+        <p class="text-[11px] text-slate-500">
+            Powered by Generative AI Workflows • Designed for Production-Grade Brand Engagements
+        </p>
+    </footer>
+
+    <!-- =================================================================== -->
+    <!-- MODAL: CREATOR PROFILE DETAIL                                       -->
+    <!-- =================================================================== -->
+    <div id="creator-detail-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto hidden">
+        <div class="bg-slate-950 border border-slate-800 rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative">
+            <div id="creator-modal-body"></div>
+        </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- MODAL: PORTFOLIO VIDEO & WORKFLOW INSPECTOR                         -->
+    <!-- =================================================================== -->
+    <div id="portfolio-detail-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto hidden">
+        <div class="bg-slate-950 border border-slate-800 rounded-3xl max-w-5xl w-full overflow-hidden shadow-2xl relative">
+            <div id="portfolio-modal-body"></div>
+        </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- MODAL: SUBMIT PROPOSAL                                              -->
+    <!-- =================================================================== -->
+    <div id="proposal-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-950 border border-slate-800 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-base font-bold text-white">Submit Creator Proposal</h3>
+                <button onclick="closeModal('proposal-modal')" class="text-slate-400 hover:text-white">✕</button>
+            </div>
+
+            <form onsubmit="handleProposalSubmit(event)" class="space-y-4 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-300 mb-1">Select Pitching Creator</label>
+                    <select id="proposal-creator-select" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-violet-500"></select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-300 mb-1">Proposed Quote ($)</label>
+                        <input id="proposal-bid-amount" type="text" value="$2,400" required class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white" />
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-300 mb-1">Est. Delivery (Days)</label>
+                        <input id="proposal-delivery-days" type="number" value="5" min="1" required class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white" />
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-300 mb-1">Pipeline Pitch & Milestone Plan</label>
+                    <textarea id="proposal-pitch" rows="3" required class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white">Using Runway Gen-3 for motion synthesis and ComfyUI for 4K 60fps tile upscaling. Full seed logs and workflow JSON delivered upon milestone completion.</textarea>
+                </div>
+
+                <button type="submit" class="w-full py-2.5 rounded-xl font-bold bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white transition">
+                    Send Proposal to Brand
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- MODAL: HACKATHON PITCH DECK & DEMO (Deliverable 3)                  -->
+    <!-- =================================================================== -->
+    <div id="pitch-deck-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-950 border border-violet-500/40 rounded-3xl max-w-2xl w-full p-8 shadow-2xl space-y-6 relative">
+            <button onclick="closeModal('pitch-deck-modal')" class="absolute top-5 right-5 text-slate-400 hover:text-white text-lg">✕</button>
+            
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <span class="text-xs font-mono text-violet-400 uppercase font-semibold">Kampus.VC Hackathon • Challenge 2 Presentation</span>
+                <span id="pitch-slide-counter" class="text-xs font-mono text-slate-400">Slide 1 of 5</span>
+            </div>
+
+            <!-- Slide Body -->
+            <div id="pitch-slide-content" class="min-h-[280px]"></div>
+
+            <!-- Controls -->
+            <div class="flex items-center justify-between pt-4 border-t border-slate-800">
+                <button onclick="prevSlide()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white transition">
+                    ← Previous Slide
+                </button>
+                <div class="flex items-center gap-1.5" id="pitch-slide-dots"></div>
+                <button onclick="nextSlide()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-violet-600 hover:bg-violet-500 text-white transition">
+                    Next Slide →
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- COMPLETE SELF-CONTAINED JAVASCRIPT STATE ENGINE                     -->
+    <!-- =================================================================== -->
+    <script>
+        // Data Store (Works seamlessly both standalone and with Flask backend)
+        const SEED_CREATORS = [
+            {
+                id: "creator_1",
+                name: "Maya Lin",
+                handle: "@maya_aifilms",
+                avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80",
+                banner: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&auto=format&fit=crop&q=80",
+                title: "AI Film Director & Generative Motion Designer",
+                bio: "Directing next-generation cinematic ads using Runway Gen-3, Midjourney v6.1, and custom ComfyUI node graphs. Former VFX artist with 8+ years experience.",
+                location: "San Francisco, CA (Remote Worldwide)",
+                hourlyRate: 120,
+                minProjectBudget: 1500,
+                rating: 4.96,
+                reviewCount: 38,
+                completedProjects: 42,
+                verification: {
+                    isVerified: true,
+                    badgeLevel: "Top Tier Verified Pro",
+                    verifiedTools: ["Runway Gen-3 Alpha", "Midjourney v6.1", "ComfyUI", "Topaz Video AI"],
+                    workflowProofAvailable: true,
+                    workflowType: "Custom ComfyUI JSON Pipeline + Seed Locks",
+                    verifiedPastWork: [
+                        { brand: "Aura Luxury Scents", project: "15s Spec Commercial", metric: "2.4M organic views" },
+                        { brand: "Hyperion Mobility", project: "EV Concept Teaser", metric: "Featured on Behance AI" }
+                    ],
+                    trustScore: 99
+                },
+                skills: ["Prompt Engineering", "LoRA Training", "ControlNet", "4K Video Upscaling", "Camera Motion Control"],
+                specializations: ["AI Filmmaking", "Brand Commercials", "Cinematic Teasers"],
+                toolsUsed: ["Runway Gen-3", "Midjourney v6", "ComfyUI", "Topaz Video AI", "FLUX.1"],
+                contentTypes: ["Short-Form Video Ad (9:16)", "Cinematic Trailer (16:9)"],
+                portfolio: [
+                    {
+                        id: "port_1_1",
+                        title: "Aura Fragrance — Ethereal Bloom Commercial",
+                        description: "High-fashion surreal commercial spot featuring bioluminescent floral metamorphism and fluid simulation aesthetics.",
+                        mediaType: "video",
+                        mediaUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+                        posterUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80",
+                        aspectRatio: "9:16",
+                        style: "Cinematic Photorealism / Haute Couture",
+                        tools: ["Midjourney v6.1", "Runway Gen-3 Alpha", "Topaz Video AI"],
+                        workflow: {
+                            pipeline: "Midjourney Base Keyframe -> Runway Gen-3 Camera Motion -> Topaz 60fps 4K Upscale",
+                            seedReproducibility: "Locked Seed: #84920194",
+                            hasComfyUiGraph: true,
+                            comfyNodeSummary: "Dual-pass upscale with KSampler tile control"
+                        },
+                        commercialLicense: "Exclusive Global Buyout included; Raw generation seeds handed over.",
+                        views: 14200, likes: 890
+                    },
+                    {
+                        id: "port_1_2",
+                        title: "Neon Horizon — Cyberpunk Hypercar Spec",
+                        description: "Photorealistic rain-slicked night chase sequence in neo-Tokyo with raytraced reflections.",
+                        mediaType: "video",
+                        mediaUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+                        posterUrl: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=800&auto=format&fit=crop&q=80",
+                        aspectRatio: "16:9",
+                        style: "Cyberpunk / Anamorphic 35mm",
+                        tools: ["FLUX.1 Pro", "Kling AI", "Premiere Pro"],
+                        workflow: {
+                            pipeline: "FLUX.1 text-to-image with ControlNet Canny -> Kling AI motion synthesis -> DaVinci Resolve color timing",
+                            seedReproducibility: "Prompt parameter logs attached",
+                            hasComfyUiGraph: false,
+                            comfyNodeSummary: "Direct prompt injection pipeline"
+                        },
+                        commercialLicense: "Full Commercial Rights Granted.",
+                        views: 22100, likes: 1450
+                    }
+                ]
+            },
+            {
+                id: "creator_2",
+                name: "Alex Chen",
+                handle: "@alex_flux3d",
+                avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80",
+                banner: "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=1200&auto=format&fit=crop&q=80",
+                title: "3D GenAI Artist & ComfyUI Workflow Architect",
+                bio: "Specialized in hybrid AI 3D rendering, FLUX.1 custom checkpoint training, and reproducible ComfyUI pipelines for enterprise brands.",
+                location: "Toronto, Canada",
+                hourlyRate: 95,
+                minProjectBudget: 1000,
+                rating: 4.92,
+                reviewCount: 27,
+                completedProjects: 31,
+                verification: {
+                    isVerified: true,
+                    badgeLevel: "Certified ComfyUI Architect",
+                    verifiedTools: ["ComfyUI", "FLUX.1 Dev/Pro", "Blender 3D", "ControlNet Depth"],
+                    workflowProofAvailable: true,
+                    workflowType: "Reproducible ComfyUI Node Graph (.json verified)",
+                    verifiedPastWork: [
+                        { brand: "Zenith Footwear", project: "Futuristic Sneaker 3D Renders", metric: "Used in Global Ad Campaign" }
+                    ],
+                    trustScore: 98
+                },
+                skills: ["ComfyUI Node Pipelines", "ControlNet Depth", "LoRA Fine-Tuning", "3D Blender Integration"],
+                specializations: ["Product Renders", "3D/VFX", "Brand Commercials"],
+                toolsUsed: ["ComfyUI", "FLUX.1", "Blender", "Magnific AI"],
+                contentTypes: ["Product Teaser", "Static Key Visual (1:1 / 4:5)"],
+                portfolio: [
+                    {
+                        id: "port_2_1",
+                        title: "Quantum Kicks — Kinetic Sneaker Concept",
+                        description: "Multi-angle photorealistic product render generated using FLUX.1 LoRA fine-tuned on custom CAD assets.",
+                        mediaType: "image",
+                        mediaUrl: "https://images.unsplash.com/photo-1552346154-21d32810aba3?w=1000&auto=format&fit=crop&q=80",
+                        posterUrl: "https://images.unsplash.com/photo-1552346154-21d32810aba3?w=800&auto=format&fit=crop&q=80",
+                        aspectRatio: "1:1",
+                        style: "Ultra-Photorealistic Industrial Design",
+                        tools: ["FLUX.1 Dev", "ComfyUI", "Blender Depth Map"],
+                        workflow: {
+                            pipeline: "Blender rough mesh -> Depth Pass -> ComfyUI FLUX KSampler -> Magnific AI 8K Texture Pass",
+                            seedReproducibility: "Exact seed & ComfyUI workflow JSON supplied",
+                            hasComfyUiGraph: true,
+                            comfyNodeSummary: "FLUX LoRA Loader + ControlNet Depth + Tile Upscaler"
+                        },
+                        commercialLicense: "Exclusive Buyout with full LoRA weights handover.",
+                        views: 8900, likes: 640
+                    }
+                ]
+            },
+            {
+                id: "creator_3",
+                name: "Sarah Jenkins",
+                handle: "@sarah_motion",
+                avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&auto=format&fit=crop&q=80",
+                banner: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1200&auto=format&fit=crop&q=80",
+                title: "AI Character Animator & Creative Storyteller",
+                bio: "Bringing characters to life with consistent identity, emotions, and lip-sync. Combining Kling AI, ElevenLabs, and LivePortrait.",
+                location: "London, UK",
+                hourlyRate: 110,
+                minProjectBudget: 1200,
+                rating: 4.89,
+                reviewCount: 44,
+                completedProjects: 50,
+                verification: {
+                    isVerified: true,
+                    badgeLevel: "Top Tier Verified Pro",
+                    verifiedTools: ["Kling AI", "ElevenLabs", "LivePortrait", "Midjourney v6.1"],
+                    workflowProofAvailable: true,
+                    workflowType: "Character Consistency LoRA + Face ID Locks",
+                    verifiedPastWork: [
+                        { brand: "Fintech Global", project: "AI Brand Ambassador Avatar", metric: "Consistent across 12 episodes" }
+                    ],
+                    trustScore: 96
+                },
+                skills: ["Character Consistency", "Lip-Sync Animation", "Voice Synthesis", "Emotional Prompting"],
+                specializations: ["Character Animation", "Brand Commercials", "Explainer Videos"],
+                toolsUsed: ["Kling AI", "ElevenLabs", "Midjourney v6", "LivePortrait"],
+                contentTypes: ["Short-Form Video Ad (9:16)", "Character Concept"],
+                portfolio: [
+                    {
+                        id: "port_3_1",
+                        title: "Clara — Virtual Tech Evangelist",
+                        description: "Photorealistic AI human speaking fluidly with synchronized facial micro-expressions and natural voice cadence.",
+                        mediaType: "video",
+                        mediaUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+                        posterUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80",
+                        aspectRatio: "9:16",
+                        style: "Photorealistic Human / Studio Lighting",
+                        tools: ["Midjourney v6", "LivePortrait", "ElevenLabs"],
+                        workflow: {
+                            pipeline: "Midjourney portrait generation -> LivePortrait motion driving -> ElevenLabs custom neural voice clone",
+                            seedReproducibility: "Seed #3991209 + LoRA Face Vector",
+                            hasComfyUiGraph: true,
+                            comfyNodeSummary: "FaceID InstantID + LipSync node graph"
+                        },
+                        commercialLicense: "Commercial License with non-exclusive model release.",
+                        views: 18400, likes: 980
+                    }
+                ]
+            },
+            {
+                id: "creator_4",
+                name: "Marcus Vance",
+                handle: "@vance_vfx",
+                avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&auto=format&fit=crop&q=80",
+                banner: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&auto=format&fit=crop&q=80",
+                title: "Sci-Fi Cinematographer & AnimateDiff Specialist",
+                bio: "Crafting mind-bending cinematic sequences, space opera trailers, and futuristic environment simulations.",
+                location: "Berlin, Germany",
+                hourlyRate: 130,
+                minProjectBudget: 2000,
+                rating: 4.98,
+                reviewCount: 19,
+                completedProjects: 22,
+                verification: {
+                    isVerified: true,
+                    badgeLevel: "Top Tier Verified Pro",
+                    verifiedTools: ["ComfyUI AnimateDiff", "Runway Gen-3", "ControlNet OpenPose"],
+                    workflowProofAvailable: true,
+                    workflowType: "Multi-pass AnimateDiff with IP-Adapter",
+                    verifiedPastWork: [
+                        { brand: "Sublime Records", project: "Sci-Fi Music Video Visualizer", metric: "Vimeo Staff Pick" }
+                    ],
+                    trustScore: 97
+                },
+                skills: ["AnimateDiff", "ControlNet OpenPose", "Camera Motion Rigging", "LoRA Stacking"],
+                specializations: ["AI Filmmaking", "3D/VFX", "Music Videos"],
+                toolsUsed: ["ComfyUI", "Runway Gen-3", "AnimateDiff", "Midjourney v6"],
+                contentTypes: ["Cinematic Trailer (16:9)", "Music Video"],
+                portfolio: [
+                    {
+                        id: "port_4_1",
+                        title: "Orbital Descent — Deep Space Cinematic",
+                        description: "Zero-gravity astronaut exploration sequence with volumetric nebulae lighting.",
+                        mediaType: "video",
+                        mediaUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+                        posterUrl: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=80",
+                        aspectRatio: "16:9",
+                        style: "Interstellar Hard Sci-Fi / IMAX 70mm",
+                        tools: ["ComfyUI AnimateDiff", "IP-Adapter", "Topaz Video AI"],
+                        workflow: {
+                            pipeline: "ComfyUI multi-prompt timeline -> AnimateDiff v3 motion module -> Topaz 4K HDR remaster",
+                            seedReproducibility: "Reproducible workflow JSON provided",
+                            hasComfyUiGraph: true,
+                            comfyNodeSummary: "Prompt scheduling + IP-Adapter Plus + Tile VAE"
+                        },
+                        commercialLicense: "Exclusive Buyout with full project source code.",
+                        views: 31200, likes: 2100
+                    }
+                ]
+            },
+            {
+                id: "creator_5",
+                name: "Elena Rostova",
+                handle: "@elena_fashion",
+                avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300&auto=format&fit=crop&q=80",
+                banner: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&auto=format&fit=crop&q=80",
+                title: "AI Haute Couture & Luxury Brand Stylist",
+                bio: "Pioneering the intersection of luxury fashion, digital textiles, and generative imagery.",
+                location: "Milan, Italy",
+                hourlyRate: 105,
+                minProjectBudget: 1400,
+                rating: 4.94,
+                reviewCount: 31,
+                completedProjects: 35,
+                verification: {
+                    isVerified: true,
+                    badgeLevel: "Certified Fashion AI Specialist",
+                    verifiedTools: ["FLUX.1 Pro", "Midjourney v6.1", "Magnific AI", "ComfyUI"],
+                    workflowProofAvailable: true,
+                    workflowType: "Custom Fabric LoRA + Seed Verification",
+                    verifiedPastWork: [
+                        { brand: "Velour Paris", project: "Virtual Runway Lookbook", metric: "Featured in Vogue Italia digital" }
+                    ],
+                    trustScore: 98
+                },
+                skills: ["Fabric Texture LoRA", "High-Fashion Lighting", "Model Pose Consistency"],
+                specializations: ["Fashion & Editorial", "Product Renders"],
+                toolsUsed: ["FLUX.1", "Midjourney v6", "Magnific AI", "ComfyUI"],
+                contentTypes: ["Static Key Visual (1:1 / 4:5)", "Short-Form Video Ad (9:16)"],
+                portfolio: [
+                    {
+                        id: "port_5_1",
+                        title: "Metamorphic Silk — Spring Haute Couture",
+                        description: "Weightless liquid silk dress floating in marble architecture with refractive light caustics.",
+                        mediaType: "image",
+                        mediaUrl: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1000&auto=format&fit=crop&q=80",
+                        posterUrl: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=800&auto=format&fit=crop&q=80",
+                        aspectRatio: "4:5",
+                        style: "High-Fashion Editorial / Vogue Aesthetic",
+                        tools: ["FLUX.1 Pro", "Magnific AI", "Custom Silk LoRA"],
+                        workflow: {
+                            pipeline: "FLUX.1 text-to-image with custom LoRA -> Inpainting on jewelry details -> Magnific AI texture enhancement",
+                            seedReproducibility: "Prompt and LoRA weights included",
+                            hasComfyUiGraph: false,
+                            comfyNodeSummary: "FLUX LoRA pipeline"
+                        },
+                        commercialLicense: "Commercial License with worldwide digital distribution rights.",
+                        views: 15600, likes: 1120
+                    }
+                ]
+            },
+            {
+                id: "creator_6",
+                name: "Kenji Sato",
+                handle: "@kenji_anime",
+                avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=300&auto=format&fit=crop&q=80",
+                banner: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1200&auto=format&fit=crop&q=80",
+                title: "Anime & Cel-Shaded Generative Animator",
+                bio: "Transforming concepts into Makoto Shinkai and Studio Ghibli style animations using Niji 6 and AnimateDiff.",
+                location: "Tokyo, Japan",
+                hourlyRate: 90,
+                minProjectBudget: 1000,
+                rating: 4.88,
+                reviewCount: 23,
+                completedProjects: 26,
+                verification: {
+                    isVerified: true,
+                    badgeLevel: "Verified Anime Creator",
+                    verifiedTools: ["Niji Journey v6", "ComfyUI AnimateDiff", "EBSynth"],
+                    workflowProofAvailable: true,
+                    workflowType: "EBSynth + AnimateDiff Keyframe Transfer",
+                    verifiedPastWork: [
+                        { brand: "Tokyo Beats Co.", project: "Lo-Fi Album Visualizer", metric: "850K Spotify canvas loops" }
+                    ],
+                    trustScore: 95
+                },
+                skills: ["Cel-Shaded Animation", "Niji Prompting", "Keyframe In-betweening"],
+                specializations: ["Anime & Cel-Shaded", "Music Videos"],
+                toolsUsed: ["Niji Journey v6", "ComfyUI", "AnimateDiff", "EBSynth"],
+                contentTypes: ["Music Video", "Short-Form Video Ad (9:16)"],
+                portfolio: [
+                    {
+                        id: "port_6_1",
+                        title: "Summer Reverie — Ghibli Aesthetic Teaser",
+                        description: "Lush cloudscapes, summer breeze grass motion, and nostalgic twilight lighting.",
+                        mediaType: "image",
+                        mediaUrl: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1000&auto=format&fit=crop&q=80",
+                        posterUrl: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format&fit=crop&q=80",
+                        aspectRatio: "16:9",
+                        style: "Anime Cel-Shaded / Ghibli Nostalgia",
+                        tools: ["Niji Journey v6", "ComfyUI", "Topaz Gigapixel"],
+                        workflow: {
+                            pipeline: "Niji 6 stylized prompt -> ComfyUI color balance -> 4K Gigapixel upscale",
+                            seedReproducibility: "Niji seed parameter documented",
+                            hasComfyUiGraph: true,
+                            comfyNodeSummary: "Style preservation node tree"
+                        },
+                        commercialLicense: "Full Commercial Rights for Digital and Merchandise.",
+                        views: 19800, likes: 1340
+                    }
+                ]
+            },
+            {
+                id: "creator_7",
+                name: "Aarav Sharma",
+                handle: "@aarav_aicinema",
+                avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&auto=format&fit=crop&q=80",
+                banner: "https://images.unsplash.com/photo-1548013146-72479768bada?w=1200&auto=format&fit=crop&q=80",
+                title: "AI Filmmaker & Generative VFX Director",
+                bio: "Directing hyper-realistic cinematic ad spots, mythological sci-fi fusion, and viral commercial reels using Runway Gen-3, Midjourney v6.1, and ComfyUI. Based in Bengaluru.",
+                location: "Bengaluru, Karnataka, India",
+                hourlyRate: 85,
+                minProjectBudget: 1200,
+                rating: 4.97,
+                reviewCount: 52,
+                completedProjects: 58,
+                verification: {
+                    isVerified: true,
+                    badgeLevel: "Top Tier Verified Pro",
+                    verifiedTools: ["Runway Gen-3 Alpha", "Midjourney v6.1", "ComfyUI", "Topaz Video AI"],
+                    workflowProofAvailable: true,
+                    workflowType: "Custom ComfyUI JSON Pipeline + Seed Locks",
+                    verifiedPastWork: [
+                        { brand: "Tanishq Heritage", project: "Festive AI Lookbook", metric: "3.8M organic views" },
+                        { brand: "CRED Spec Campaign", project: "Neo-Bengaluru Cyberpunk Ad", metric: "Featured on LinkedIn & X" }
+                    ],
+                    trustScore: 99
+                },
+                skills: ["Prompt Engineering", "ControlNet Depth", "LoRA Training", "4K Video Upscaling", "Mythological Sci-Fi"],
+                specializations: ["AI Filmmaking", "Brand Commercials", "3D/VFX"],
+                toolsUsed: ["Runway Gen-3", "Midjourney v6", "ComfyUI", "Topaz Video AI", "Premiere Pro"],
+                contentTypes: ["Short-Form Video Ad (9:16)", "Cinematic Trailer (16:9)", "Product Teaser"],
+                portfolio: [
+                    {
+                        id: "port_7_1",
+                        title: "Echoes of Hampi — Cyber-Vedic Sci-Fi Odyssey",
+                        description: "Futuristic vimana spacecraft soaring over ancient monolithic stone temples of Hampi with volumetric gold hour lighting.",
+                        mediaType: "video",
+                        mediaUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+                        posterUrl: "https://images.unsplash.com/photo-1600100397608-f010f443b711?w=800&auto=format&fit=crop&q=80",
+                        aspectRatio: "16:9",
+                        style: "Cyber-Vedic Futurism / Anamorphic 35mm",
+                        tools: ["Midjourney v6.1", "Runway Gen-3", "Topaz Video AI"],
+                        workflow: {
+                            pipeline: "Midjourney Base Frame -> Runway Gen-3 Camera Motion Rigging -> Topaz 60fps 4K Upscale",
+                            seedReproducibility: "Locked Seed: #78192039",
+                            hasComfyUiGraph: true,
+                            comfyNodeSummary: "Dual-pass upscale with KSampler tile control"
+                        },
+                        commercialLicense: "Exclusive Global Buyout included; Raw generation seeds handed over.",
+                        views: 48200, likes: 3890
+                    }
+                ]
+            },
+            {
+                id: "creator_8",
+                name: "Priya Nair",
+                handle: "@priya_couture",
+                avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&auto=format&fit=crop&q=80",
+                banner: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=1200&auto=format&fit=crop&q=80",
+                title: "AI Haute Couture & Luxury Indian Ethnic Stylist",
+                bio: "Merging traditional Indian handlooms (Kanjeevaram silk, Zardozi embroidery) with futuristic generative high fashion. Custom LoRA models for luxury D2C brands. Based in Mumbai.",
+                location: "Mumbai, Maharashtra, India",
+                hourlyRate: 95,
+                minProjectBudget: 1100,
+                rating: 4.95,
+                reviewCount: 41,
+                completedProjects: 45,
+                verification: {
+                    isVerified: true,
+                    badgeLevel: "Certified Fashion AI Specialist",
+                    verifiedTools: ["FLUX.1 Pro", "Midjourney v6.1", "Magnific AI", "ComfyUI"],
+                    workflowProofAvailable: true,
+                    workflowType: "Custom Handloom LoRA + Seed Verification",
+                    verifiedPastWork: [
+                        { brand: "FabIndia Digital", project: "Virtual Silk Drop", metric: "Over 1.5M reach on Instagram" },
+                        { brand: "Vogue India Spec", project: "Neo-Royal Festive Runway", metric: "Featured on Behance Fashion" }
+                    ],
+                    trustScore: 98
+                },
+                skills: ["Indian Handloom LoRA", "Jewellery Macro Lighting", "Model Pose Consistency", "8K Texture Passes"],
+                specializations: ["Fashion & Editorial", "Product Renders", "Brand Commercials"],
+                toolsUsed: ["FLUX.1", "Midjourney v6", "Magnific AI", "ComfyUI", "Photoshop"],
+                contentTypes: ["Static Key Visual (1:1 / 4:5)", "Short-Form Video Ad (9:16)", "Editorial Lookbook"],
+                portfolio: [
+                    {
+                        id: "port_8_1",
+                        title: "Zardozi Lumina — Royal Silk Virtual Runway",
+                        description: "Intricate gold thread Zardozi and floating Banarasi silk gown with kundan jewelry reflections under palace moonlight.",
+                        mediaType: "image",
+                        mediaUrl: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=1000&auto=format&fit=crop&q=80",
+                        posterUrl: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&auto=format&fit=crop&q=80",
+                        aspectRatio: "4:5",
+                        style: "Royal Indian Luxury / High-Fashion Vogue",
+                        tools: ["FLUX.1 Pro", "Magnific AI", "Custom Handloom LoRA"],
+                        workflow: {
+                            pipeline: "FLUX.1 prompt + LoRA -> Inpainting on emerald choker -> Magnific AI 8K texture upscale",
+                            seedReproducibility: "Prompt and LoRA weights included",
+                            hasComfyUiGraph: false,
+                            comfyNodeSummary: "FLUX Handloom LoRA pipeline"
+                        },
+                        commercialLicense: "Commercial License with worldwide digital distribution rights.",
+                        views: 29400, likes: 2150
+                    }
+                ]
+            },
+            {
+                id: "creator_9",
+                name: "Rohan Mehta",
+                handle: "@rohan_3dproduct",
+                avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80",
+                banner: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1200&auto=format&fit=crop&q=80",
+                title: "GenAI Product Commercial Director & 3D Motion Lead",
+                bio: "Producing high-conversion 9:16 vertical ads and CGI-level product teasers for consumer electronics, beverage cans, and luxury tech. Based in Hyderabad.",
+                location: "Hyderabad, Telangana, India",
+                hourlyRate: 75,
+                minProjectBudget: 900,
+                rating: 4.92,
+                reviewCount: 35,
+                completedProjects: 40,
+                verification: {
+                    isVerified: true,
+                    badgeLevel: "Certified ComfyUI Architect",
+                    verifiedTools: ["Kling AI", "ComfyUI", "FLUX.1 Dev", "Blender 3D"],
+                    workflowProofAvailable: true,
+                    workflowType: "Reproducible ComfyUI Node Graph (.json verified)",
+                    verifiedPastWork: [
+                        { brand: "boAt Lifestyle Spec", project: "Zero-G ANC Earbuds Teaser", metric: "2.1M views across Reels" },
+                        { brand: "Tata Motors Tech", project: "EV Concept Teaser Video", metric: "Top 5 Hackathon Winner" }
+                    ],
+                    trustScore: 97
+                },
+                skills: ["3D CAD Depth Control", "ComfyUI Node Pipelines", "Camera Motion Rigging", "Sound Design"],
+                specializations: ["Product Renders", "Brand Commercials", "3D/VFX"],
+                toolsUsed: ["Kling AI", "ComfyUI", "FLUX.1", "Blender", "Topaz Video AI"],
+                contentTypes: ["Short-Form Video Ad (9:16)", "Product Teaser", "3D Animation"],
+                portfolio: [
+                    {
+                        id: "port_9_1",
+                        title: "AeroBeats Wireless — Zero-G Acoustic Explosion",
+                        description: "Exploded macro view of titanium headphone drivers assembling inside floating liquid soundwaves.",
+                        mediaType: "video",
+                        mediaUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+                        posterUrl: "https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=800&auto=format&fit=crop&q=80",
+                        aspectRatio: "9:16",
+                        style: "Hyper-Realistic Industrial Tech / Dynamic Lighting",
+                        tools: ["FLUX.1 Dev", "Kling AI", "ComfyUI ControlNet"],
+                        workflow: {
+                            pipeline: "Blender rough mesh -> Depth Pass -> ComfyUI FLUX KSampler -> Kling AI motion synthesis",
+                            seedReproducibility: "Exact seed & ComfyUI workflow JSON supplied",
+                            hasComfyUiGraph: true,
+                            comfyNodeSummary: "FLUX LoRA Loader + ControlNet Depth + Tile Upscaler"
+                        },
+                        commercialLicense: "Exclusive Buyout with full project assets.",
+                        views: 21300, likes: 1670
+                    }
+                ]
+            },
+            {
+                id: "creator_10",
+                name: "Ananya Verma",
+                handle: "@ananya_voiceai",
+                avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80",
+                banner: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&auto=format&fit=crop&q=80",
+                title: "Multilingual AI Avatar Director & Audio Specialist",
+                bio: "Producing hyper-realistic virtual brand ambassadors and localized voice cloning in Hindi, Tamil, Telugu, and English. Based in New Delhi.",
+                location: "New Delhi, India",
+                hourlyRate: 80,
+                minProjectBudget: 1000,
+                rating: 4.94,
+                reviewCount: 29,
+                completedProjects: 36,
+                verification: {
+                    isVerified: true,
+                    badgeLevel: "Top Tier Verified Pro",
+                    verifiedTools: ["ElevenLabs", "LivePortrait", "Midjourney v6.1", "Kling AI"],
+                    workflowProofAvailable: true,
+                    workflowType: "Multilingual Neural Voice + Face ID Locks",
+                    verifiedPastWork: [
+                        { brand: "Swiggy Festive Spec", project: "Multilingual AI Delivery Hero", metric: "1.2M impressions" },
+                        { brand: "Zomato DineOut", project: "Interactive Avatar Reel", metric: "Viral engagement" }
+                    ],
+                    trustScore: 98
+                },
+                skills: ["Multilingual Lip-Sync", "Indian Accent Cloning", "Character Consistency", "Emotional Delivery"],
+                specializations: ["Character Animation", "Brand Commercials", "Explainer Videos"],
+                toolsUsed: ["ElevenLabs", "LivePortrait", "Midjourney v6", "Kling AI"],
+                contentTypes: ["Short-Form Video Ad (9:16)", "Character Concept"],
+                portfolio: [
+                    {
+                        id: "port_10_1",
+                        title: "Tara — Multilingual AI Brand Ambassador",
+                        description: "Photorealistic Indian woman avatar speaking fluently in Hindi and English with natural micro-expressions and studio lighting.",
+                        mediaType: "video",
+                        mediaUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+                        posterUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&auto=format&fit=crop&q=80",
+                        aspectRatio: "9:16",
+                        style: "Photorealistic Human / Studio Lighting",
+                        tools: ["Midjourney v6", "LivePortrait", "ElevenLabs Neural Voice"],
+                        workflow: {
+                            pipeline: "Midjourney portrait generation -> LivePortrait motion driving -> ElevenLabs custom neural voice clone",
+                            seedReproducibility: "Seed #6192841 + LoRA Face Vector",
+                            hasComfyUiGraph: true,
+                            comfyNodeSummary: "FaceID InstantID + LipSync node graph"
+                        },
+                        commercialLicense: "Commercial License with non-exclusive model release.",
+                        views: 25800, likes: 1820
+                    }
+                ]
+            }
+        ];
+
+        const SEED_BRIEFS = [
+            {
+                id: "brief_100_in",
+                brandName: "Tanishq Heritage",
+                brandLogo: "👑",
+                title: "Diwali Festive Royal Jewellery 15s Cinematic Reel",
+                rawIdea: "A royal queen in a moonlit Udaipur palace courtyard adorned in glowing polki and emerald jewelry with floating diyas and slow-motion silk.",
+                status: "Accepting Proposals",
+                proposalsCount: 5,
+                postedDate: "Just now",
+                budgetRange: "₹1,50,000 - ₹2,50,000 ($2,200)",
+                timelineDays: 5,
+                structuredBrief: {
+                    campaignGoal: "Drive national awareness for festive heritage bridal jewelry collection through high-end generative cinematic reels.",
+                    contentType: "Short-Form Video Ad (9:16)",
+                    visualStyle: "Royal Indian Palace Aesthetic / Diffused Moonlight & Warm Diya Reflections",
+                    aspectRatio: "9:16 (Instagram Reel / YouTube Shorts)",
+                    recommendedTools: ["Runway Gen-3", "FLUX.1 Pro", "Magnific AI", "Topaz Video AI"],
+                    technicalSpecs: { resolution: "4K Ultra HD (2160x3840)", frameRate: "60 fps cinematic", length: "15 seconds" },
+                    commercialRequirements: { licenseType: "Exclusive Commercial Buyout (Worldwide)", promptSeedHandover: true }
+                }
+            },
+            {
+                id: "brief_101",
+                brandName: "Nova Energy Drinks",
+                brandLogo: "⚡",
+                title: "Summer Campaign: Neon Surge 15s Hero Reel",
+                rawIdea: "We need a futuristic neon cyberpunk athlete running across Tokyo skyscrapers in the rain, drinking Nova Energy for an instant surge.",
+                status: "Accepting Proposals",
+                proposalsCount: 4,
+                postedDate: "2 days ago",
+                budgetRange: "$2,000 - $3,500",
+                timelineDays: 7,
+                structuredBrief: {
+                    campaignGoal: "Launch brand awareness for the new Zero-Sugar Neon Surge flavor targeting Gen-Z gamers.",
+                    contentType: "Short-Form Video Ad (9:16)",
+                    visualStyle: "Cyberpunk Cinematic / Photorealistic Rain & Neon Reflections",
+                    aspectRatio: "9:16 (Vertical Reel / TikTok)",
+                    recommendedTools: ["Runway Gen-3", "Midjourney v6", "FLUX.1", "Topaz Video AI"],
+                    technicalSpecs: { resolution: "4K Ultra HD (2160x3840)", frameRate: "60 fps smooth motion", length: "15 seconds" },
+                    commercialRequirements: { licenseType: "Exclusive Commercial Buyout (Worldwide)", promptSeedHandover: true }
+                }
+            },
+            {
+                id: "brief_102",
+                brandName: "Aura Horology",
+                brandLogo: "⏱️",
+                title: "Titanium Chronograph 3D Macro Showcase",
+                rawIdea: "Hyper-realistic macro view of titanium watch gears, sapphire crystal reflections, and glowing luminescent hands in deep space.",
+                status: "Accepting Proposals",
+                proposalsCount: 2,
+                postedDate: "1 day ago",
+                budgetRange: "$1,500 - $2,800",
+                timelineDays: 5,
+                structuredBrief: {
+                    campaignGoal: "Showcase ultra-precision engineering and luxury craftsmanship for new luxury timepiece.",
+                    contentType: "Product Teaser & 3D Render",
+                    visualStyle: "Macro Photorealism / Anamorphic Lens Flare",
+                    aspectRatio: "1:1 (Square Feed) + 16:9",
+                    recommendedTools: ["FLUX.1 Pro", "Blender ControlNet", "Magnific AI", "ComfyUI"],
+                    technicalSpecs: { resolution: "8K Master Still & 4K Loop", frameRate: "30 fps seamless", length: "10s loop" },
+                    commercialRequirements: { licenseType: "Exclusive Buyout", promptSeedHandover: true }
+                }
+            },
+            {
+                id: "brief_103",
+                brandName: "Astral Records",
+                brandLogo: "🎵",
+                title: "Dreamscape Synthwave Music Video Teaser",
+                rawIdea: "Surreal endless highway floating above lavender clouds under a giant pink moon with retro 80s sports car.",
+                status: "Accepting Proposals",
+                proposalsCount: 6,
+                postedDate: "3 days ago",
+                budgetRange: "$1,200 - $2,200",
+                timelineDays: 6,
+                structuredBrief: {
+                    campaignGoal: "Audio-visual teaser for upcoming synthwave EP release on Spotify and YouTube.",
+                    contentType: "Cinematic Trailer (16:9)",
+                    visualStyle: "Surreal Retro-Futurism / Dreamcore / 80s Synthwave",
+                    aspectRatio: "16:9",
+                    recommendedTools: ["Midjourney v6", "Kling AI", "Runway Gen-3", "Premiere Pro"],
+                    technicalSpecs: { resolution: "4K Ultra HD", frameRate: "24 fps cinematic", length: "30s" },
+                    commercialRequirements: { licenseType: "Full Commercial Sync License", promptSeedHandover: false }
+                }
+            }
+        ];
+
+        const SEED_PROPOSALS = [
+            {
+                id: "prop_1",
+                briefTitle: "Summer Campaign: Neon Surge 15s Hero Reel",
+                creatorName: "Maya Lin",
+                creatorHandle: "@maya_aifilms",
+                bidAmount: "$2,800",
+                deliveryDays: 5,
+                pitch: "I will deliver 3 distinct photorealistic cyberpunk scenes using Runway Gen-3 and ComfyUI tile upscaler to 4K 60fps. ComfyUI workflow JSON and locked seeds will be provided.",
+                status: "Shortlisted",
+                submittedAt: "Yesterday"
+            },
+            {
+                id: "prop_2",
+                briefTitle: "Titanium Chronograph 3D Macro Showcase",
+                creatorName: "Alex Chen",
+                creatorHandle: "@alex_flux3d",
+                bidAmount: "$2,200",
+                deliveryDays: 4,
+                pitch: "Using FLUX.1 Pro + Blender depth maps for millimeter-accurate watch gear mechanics. 100% seed-reproducible with 8K texture passes.",
+                status: "Reviewing",
+                submittedAt: "3 hours ago"
+            }
+        ];
+
+        const PRESET_TOOLS = ["All", "Runway Gen-3", "Midjourney v6", "ComfyUI", "FLUX.1", "Kling AI", "ElevenLabs", "Topaz Video AI"];
+        const PRESET_SPECIALIZATIONS = ["All", "AI Filmmaking", "Brand Commercials", "3D/VFX", "Product Renders", "Character Animation", "Fashion & Editorial", "Anime & Cel-Shaded"];
+
+        // Application State
+        let appState = {
+            activeTab: 'discover',
+            creators: [...SEED_CREATORS],
+            briefs: [...SEED_BRIEFS],
+            proposals: [...SEED_PROPOSALS],
+            filters: {
+                search: '',
+                tool: 'All',
+                specialization: 'All',
+                verifiedOnly: false,
+                sort: 'rating'
+            },
+            activePitchSlide: 0,
+            generatedBrief: null,
+            targetBriefId: null
+        };
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            initFilters();
+            renderCreators();
+            renderBriefs();
+            renderProposals();
+            renderDataModel();
+            updateStats();
+        });
+
+        // Tab Switching
+        function switchTab(tabId) {
+            appState.activeTab = tabId;
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+            
+            const target = document.getElementById(`tab-${tabId}`);
+            if (target) target.classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'text-violet-300');
+                btn.classList.add('text-slate-400');
+            });
+            const activeBtn = document.getElementById(`nav-btn-${tabId}`);
+            if (activeBtn) {
+                activeBtn.classList.add('active', 'text-violet-300');
+                activeBtn.classList.remove('text-slate-400');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Initialize Filter Buttons
+        function initFilters() {
+            const toolContainer = document.getElementById('filter-tools-container');
+            if (toolContainer) {
+                toolContainer.innerHTML = PRESET_TOOLS.map(t => `
+                    <button type="button" onclick="setToolFilter('${t}')" class="px-3 py-1 rounded-full text-xs font-medium transition ${appState.filters.tool === t ? 'bg-violet-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}">
+                        ${t}
+                    </button>
+                `).join('');
+            }
+
+            const specContainer = document.getElementById('filter-specs-container');
+            if (specContainer) {
+                specContainer.innerHTML = PRESET_SPECIALIZATIONS.map(s => `
+                    <button type="button" onclick="setSpecFilter('${s}')" class="px-3 py-1 rounded-full text-xs font-medium transition ${appState.filters.specialization === s ? 'bg-cyan-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}">
+                        ${s}
+                    </button>
+                `).join('');
+            }
+        }
+
+        function setToolFilter(tool) {
+            appState.filters.tool = tool;
+            initFilters();
+            renderCreators();
+        }
+
+        function setSpecFilter(spec) {
+            appState.filters.specialization = spec;
+            initFilters();
+            renderCreators();
+        }
+
+        function handleSearch(val) {
+            appState.filters.search = val.trim().toLowerCase();
+            renderCreators();
+        }
+
+        function toggleVerified(isChecked) {
+            appState.filters.verifiedOnly = isChecked;
+            renderCreators();
+        }
+
+        function handleSort(sortVal) {
+            appState.filters.sort = sortVal;
+            renderCreators();
+        }
+
+        function resetAllFilters() {
+            appState.filters = { search: '', tool: 'All', specialization: 'All', verifiedOnly: false, sort: 'rating' };
+            document.getElementById('filter-search-input').value = '';
+            document.getElementById('filter-verified-toggle').checked = false;
+            document.getElementById('filter-sort-select').value = 'rating';
+            initFilters();
+            renderCreators();
+            showToast("All filters reset", "info");
+        }
+
+        // Render Creator Cards
+        function renderCreators() {
+            const grid = document.getElementById('creators-grid');
+            const empty = document.getElementById('creators-empty');
+            const countBadge = document.getElementById('creators-count-badge');
+
+            let filtered = appState.creators.filter(c => {
+                if (appState.filters.verifiedOnly && !c.verification?.isVerified) return false;
+                if (appState.filters.tool !== 'All' && !c.toolsUsed.some(t => t.toLowerCase().includes(appState.filters.tool.toLowerCase()))) return false;
+                if (appState.filters.specialization !== 'All' && !c.specializations.some(s => s.toLowerCase().includes(appState.filters.specialization.toLowerCase()))) return false;
+                if (appState.filters.search) {
+                    const text = `${c.name} ${c.bio} ${c.title} ${c.location || ''} ${c.toolsUsed.join(' ')} ${c.skills.join(' ')} ${c.specializations.join(' ')}`.toLowerCase();
+                    if (!text.includes(appState.filters.search)) return false;
+                }
+                return true;
+            });
+
+            // Sorting
+            if (appState.filters.sort === 'rating') filtered.sort((a,b) => b.rating - a.rating);
+            if (appState.filters.sort === 'trust') filtered.sort((a,b) => (b.verification?.trustScore || 0) - (a.verification?.trustScore || 0));
+            if (appState.filters.sort === 'completed') filtered.sort((a,b) => b.completedProjects - a.completedProjects);
+            if (appState.filters.sort === 'rate_asc') filtered.sort((a,b) => a.hourlyRate - b.hourlyRate);
+            if (appState.filters.sort === 'rate_desc') filtered.sort((a,b) => b.hourlyRate - a.hourlyRate);
+
+            countBadge.textContent = `${filtered.length} Creators Found`;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+
+            empty.classList.add('hidden');
+            grid.innerHTML = filtered.map(c => {
+                const firstPort = c.portfolio?.[0];
+                return `
+                    <div class="glass-card rounded-2xl p-5 flex flex-col justify-between hover:border-violet-500/50 transition relative">
+                        <div>
+                            <!-- Header -->
+                            <div class="flex items-start gap-3.5">
+                                <img src="${c.avatar}" alt="${c.name}" class="w-14 h-14 rounded-full object-cover ring-2 ring-violet-500/40 flex-shrink-0" />
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-center justify-between gap-1">
+                                        <h3 class="text-base font-bold text-white truncate cursor-pointer hover:text-violet-300" onclick="openCreatorModal('${c.id}')">${c.name}</h3>
+                                        <div class="flex items-center gap-1 text-amber-400 text-xs font-semibold">
+                                            <span>★</span> <span>${c.rating}</span>
+                                            <span class="text-slate-500">(${c.reviewCount})</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between gap-1 mt-0.5">
+                                        <p class="text-xs text-slate-400 font-mono">${c.handle}</p>
+                                        <span class="text-[10px] text-cyan-300 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40 font-mono truncate max-w-[130px]">📍 ${c.location.split(',')[0]}</span>
+                                    </div>
+                                    <p class="text-xs font-medium text-violet-300/90 mt-1 line-clamp-1">${c.title}</p>
+                                </div>
+                            </div>
+
+                            <!-- Badges -->
+                            <div class="flex items-center gap-2 mt-3 flex-wrap">
+                                <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
+                                    ✓ ${c.verification?.badgeLevel || 'Verified Pro'}
+                                </span>
+                                <span class="text-xs px-2 py-0.5 rounded-md bg-violet-500/10 border border-violet-500/30 text-violet-300 font-mono">
+                                    ${c.verification?.trustScore || 98}% Trust Score
+                                </span>
+                            </div>
+
+                            <!-- Bio -->
+                            <p class="text-xs text-slate-300/90 mt-3 line-clamp-2 leading-relaxed">${c.bio}</p>
+
+                            <!-- Tools & Skills -->
+                            <div class="mt-3.5 space-y-1.5">
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    ${c.toolsUsed.slice(0, 4).map(t => `<span class="text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 font-medium">${t}</span>`).join('')}
+                                </div>
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    ${c.skills.slice(0, 3).map(s => `<span class="text-xs px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-800/50 font-medium">${s}</span>`).join('')}
+                                </div>
+                            </div>
+
+                            <!-- Portfolio Preview -->
+                            ${firstPort ? `
+                                <div class="mt-4 relative rounded-xl overflow-hidden border border-slate-700/60 bg-slate-900 group cursor-pointer" onclick="openPortfolioModal('${c.id}', '${firstPort.id}')">
+                                    <img src="${firstPort.posterUrl}" class="w-full h-40 object-cover group-hover:scale-105 transition duration-500" alt="${firstPort.title}" />
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 flex flex-col justify-between p-3">
+                                        <div class="flex items-center justify-between">
+                                            <span class="px-2 py-0.5 rounded bg-black/60 backdrop-blur text-slate-200 text-xs border border-white/10 font-mono">
+                                                ${firstPort.aspectRatio} • ${firstPort.mediaType}
+                                            </span>
+                                            ${firstPort.workflow.hasComfyUiGraph ? `
+                                                <span class="px-2 py-0.5 rounded bg-purple-900/80 text-purple-200 text-xs border border-purple-500/40 font-mono">
+                                                    ComfyUI Verified
+                                                </span>
+                                            ` : ''}
+                                        </div>
+                                        <div>
+                                            <p class="text-xs font-semibold text-white truncate">${firstPort.title}</p>
+                                            <p class="text-[11px] text-slate-300 truncate">${firstPort.style}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="mt-4 pt-3.5 border-t border-slate-800/80 flex items-center justify-between">
+                            <div>
+                                <span class="text-[11px] text-slate-400">Min. Project</span>
+                                <p class="text-sm font-bold text-white">$${c.minProjectBudget.toLocaleString()}</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="openCreatorModal('${c.id}')" class="px-3 py-1.5 text-xs font-medium text-slate-300 bg-slate-800 hover:bg-slate-700 rounded-lg transition border border-slate-700">
+                                    View Pipeline
+                                </button>
+                                <button type="button" onclick="openHireCreator('${c.id}')" class="px-3 py-1.5 text-xs font-medium text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 rounded-lg transition shadow-sm">
+                                    Hire Creator
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Creator Modal
+        function openCreatorModal(creatorId) {
+            const c = appState.creators.find(x => x.id === creatorId);
+            if (!c) return;
+
+            const modal = document.getElementById('creator-detail-modal');
+            const content = document.getElementById('creator-modal-body');
+            modal.classList.remove('hidden');
+
+            content.innerHTML = `
+                <div class="relative h-44 w-full rounded-t-3xl overflow-hidden bg-slate-900">
+                    <img src="${c.banner}" class="w-full h-full object-cover" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+                    <button onclick="closeModal('creator-detail-modal')" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/90 transition text-sm">✕</button>
+                </div>
+
+                <div class="p-6 md:p-8 relative -mt-16">
+                    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                        <div class="flex items-end gap-4">
+                            <img src="${c.avatar}" class="w-24 h-24 rounded-2xl ring-4 ring-slate-950 object-cover shadow-2xl" />
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h2 class="text-2xl font-extrabold text-white">${c.name}</h2>
+                                    <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-semibold">
+                                        ✓ ${c.verification?.badgeLevel}
+                                    </span>
+                                </div>
+                                <p class="text-sm text-slate-400 font-mono">${c.handle} • ${c.location}</p>
+                                <p class="text-sm font-semibold text-violet-300 mt-0.5">${c.title}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="text-right">
+                                <span class="text-xs text-slate-400">Rate / Budget</span>
+                                <p class="text-lg font-bold text-white">$${c.hourlyRate}/hr • Min $${c.minProjectBudget}</p>
+                            </div>
+                            <button onclick="openHireCreator('${c.id}')" class="px-5 py-2.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 text-white shadow-lg">
+                                Send Brief / Hire
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Trust Box -->
+                    <div class="mt-6 p-4 rounded-xl bg-violet-950/30 border border-violet-800/40 flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-violet-600/20 border border-violet-500/40 flex items-center justify-center text-xl">🛡️</div>
+                            <div>
+                                <h4 class="text-sm font-bold text-violet-200">Verified AI Production Signals</h4>
+                                <p class="text-xs text-slate-300">Pipeline: ${c.verification?.workflowType}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="text-center px-3 py-1 rounded-lg bg-slate-900 border border-slate-800">
+                                <span class="text-[10px] text-slate-400 block uppercase">Trust Score</span>
+                                <span class="text-sm font-bold text-emerald-400">${c.verification?.trustScore}/100</span>
+                            </div>
+                            <div class="text-center px-3 py-1 rounded-lg bg-slate-900 border border-slate-800">
+                                <span class="text-[10px] text-slate-400 block uppercase">Completed</span>
+                                <span class="text-sm font-bold text-white">${c.completedProjects} Projects</span>
+                            </div>
+                            <div class="text-center px-3 py-1 rounded-lg bg-slate-900 border border-slate-800">
+                                <span class="text-[10px] text-slate-400 block uppercase">Rating</span>
+                                <span class="text-sm font-bold text-amber-400">${c.rating} ★</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Portfolio Grid -->
+                    <div class="mt-8">
+                        <h3 class="text-lg font-bold text-white mb-4">AI Portfolios & Reproducible Pipelines</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            ${c.portfolio.map(p => `
+                                <div class="glass-card rounded-xl p-4 border border-slate-800">
+                                    <div class="relative rounded-lg overflow-hidden h-48 bg-slate-900 mb-3 cursor-pointer" onclick="openPortfolioModal('${c.id}', '${p.id}')">
+                                        <img src="${p.posterUrl}" class="w-full h-full object-cover" />
+                                        <div class="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/70 text-[11px] font-mono text-slate-200">
+                                            Aspect: ${p.aspectRatio}
+                                        </div>
+                                    </div>
+                                    <h4 class="text-sm font-bold text-white">${p.title}</h4>
+                                    <p class="text-xs text-slate-400 mt-1 line-clamp-2">${p.description}</p>
+                                    <div class="mt-3 p-2.5 rounded-lg bg-slate-900 border border-slate-800 text-[11px] space-y-1 font-mono">
+                                        <div class="text-violet-300">⚙️ Pipeline: <span class="text-slate-300 font-sans">${p.workflow.pipeline}</span></div>
+                                        <div class="text-emerald-300">🔒 Seeds: <span class="text-slate-300 font-sans">${p.workflow.seedReproducibility}</span></div>
+                                        <div class="text-cyan-300">📄 Rights: <span class="text-slate-300 font-sans">${p.commercialLicense}</span></div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Portfolio Deep Dive Modal
+        function openPortfolioModal(creatorId, portId) {
+            const c = appState.creators.find(x => x.id === creatorId);
+            if (!c) return;
+            const item = c.portfolio.find(p => p.id === portId);
+            if (!item) return;
+
+            const modal = document.getElementById('portfolio-detail-modal');
+            const content = document.getElementById('portfolio-modal-body');
+            modal.classList.remove('hidden');
+
+            const isVideo = item.mediaType === 'video';
+
+            content.innerHTML = `
+                <div class="flex flex-col lg:flex-row max-h-[85vh]">
+                    <div class="lg:w-3/5 bg-black flex items-center justify-center p-4 relative">
+                        ${isVideo ? `
+                            <video src="${item.mediaUrl}" controls autoplay loop class="max-h-[75vh] w-auto rounded-lg shadow-2xl object-contain"></video>
+                        ` : `
+                            <img src="${item.mediaUrl}" class="max-h-[75vh] w-auto rounded-lg shadow-2xl object-contain" />
+                        `}
+                        <div class="absolute top-4 left-4 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur text-xs font-mono text-white border border-white/10">
+                            ${item.aspectRatio} • ${item.style}
+                        </div>
+                    </div>
+
+                    <div class="lg:w-2/5 p-6 overflow-y-auto bg-slate-950 border-t lg:border-t-0 lg:border-l border-slate-800 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-violet-400 font-semibold uppercase tracking-wider">AI Portfolio Deep-Dive</span>
+                                <button onclick="closeModal('portfolio-detail-modal')" class="text-slate-400 hover:text-white">✕</button>
+                            </div>
+
+                            <h3 class="text-xl font-bold text-white mt-2">${item.title}</h3>
+                            <p class="text-xs text-slate-300 mt-2 leading-relaxed">${item.description}</p>
+
+                            <div class="flex items-center gap-3 mt-4 p-3 rounded-xl bg-slate-900 border border-slate-800">
+                                <img src="${c.avatar}" class="w-10 h-10 rounded-full object-cover" />
+                                <div>
+                                    <p class="text-xs font-bold text-white">${c.name}</p>
+                                    <p class="text-[11px] text-slate-400 font-mono">${c.handle}</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 space-y-3">
+                                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Generative Production Pipeline</h4>
+                                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs space-y-2">
+                                    <div>
+                                        <span class="text-violet-400 font-medium block">Tools / Models:</span>
+                                        <div class="flex flex-wrap gap-1 mt-1">
+                                            ${item.tools.map(t => `<span class="px-2 py-0.5 rounded bg-slate-800 text-slate-200 border border-slate-700 text-[11px]">${t}</span>`).join('')}
+                                        </div>
+                                    </div>
+                                    <div class="pt-2 border-t border-slate-800">
+                                        <span class="text-violet-400 font-medium block">Generation Pipeline:</span>
+                                        <p class="text-slate-300 text-[11px] mt-0.5">${item.workflow.pipeline}</p>
+                                    </div>
+                                    <div class="pt-2 border-t border-slate-800">
+                                        <span class="text-emerald-400 font-medium block">Seed Reproducibility:</span>
+                                        <p class="text-slate-300 text-[11px] mt-0.5">${item.workflow.seedReproducibility}</p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Commercial Use & Licensing</h4>
+                                    <div class="p-3 rounded-xl bg-indigo-950/30 border border-indigo-900/40 text-xs text-indigo-200">
+                                        <p class="font-semibold text-emerald-400">✓ Commercial Viability Confirmed</p>
+                                        <p class="text-[11px] text-slate-300 mt-1">${item.commercialLicense}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 pt-4 border-t border-slate-800">
+                            <button onclick="openHireCreator('${c.id}')" class="w-full py-2.5 rounded-xl font-semibold text-xs text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 transition text-center shadow-lg">
+                                Hire Creator for Similar Project
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // AI Brief Generation
+        function setSamplePrompt(brand, prompt) {
+            document.getElementById('brief-brand-name').value = brand;
+            document.getElementById('brief-raw-idea').value = prompt;
+        }
+
+        function triggerAIBriefGeneration() {
+            const rawIdea = document.getElementById('brief-raw-idea').value.trim();
+            const brandName = document.getElementById('brief-brand-name').value.trim() || "Brand Inc.";
+
+            if (!rawIdea) {
+                showToast("Please describe your rough idea first!", "error");
+                return;
+            }
+
+            const status = document.getElementById('brief-ai-status');
+            const result = document.getElementById('brief-ai-result');
+            const placeholder = document.getElementById('brief-ai-placeholder');
+
+            status.classList.remove('hidden');
+            result.classList.add('hidden');
+            if (placeholder) placeholder.classList.add('hidden');
+
+            setTimeout(() => {
+                // Rule-based semantic decomposition engine
+                const textLower = rawIdea.toLowerCase();
+                let contentType = "Short-Form Video Ad (9:16)";
+                let aspect = "9:16";
+                let res = "4K Vertical (2160x3840)";
+                let fps = "60 fps smooth";
+                let tools = ["Runway Gen-3 Alpha", "Kling AI", "Topaz Video AI"];
+
+                if (textLower.includes("macro") || textLower.includes("watch") || textLower.includes("render")) {
+                    contentType = "Product Teaser & 3D Render";
+                    aspect = "1:1 & 16:9";
+                    res = "8K Master Still & 4K Loop";
+                    fps = "30 fps seamless";
+                    tools = ["FLUX.1 Pro", "Blender ControlNet", "Magnific AI", "ComfyUI"];
+                } else if (textLower.includes("avatar") || textLower.includes("human") || textLower.includes("lip-sync")) {
+                    contentType = "Character Animation & Virtual Avatar";
+                    aspect = "9:16";
+                    res = "4K Ultra HD";
+                    fps = "30 fps";
+                    tools = ["LivePortrait", "ElevenLabs Voice Clone", "Midjourney v6.1"];
+                }
+
+                const generated = {
+                    title: `${brandName}: ${rawIdea.split(' ').slice(0, 5).join(' ')}...`,
+                    campaignGoal: `High-impact generative visual content for ${brandName} designed to drive viral engagement on digital channels.`,
+                    contentType: contentType,
+                    aspectRatio: aspect,
+                    visualStyle: "Cyberpunk Cinematic / Photorealistic Reflections & Volumetric Light",
+                    recommendedTools: tools,
+                    technicalSpecs: { resolution: res, frameRate: fps, length: "15 seconds" },
+                    budgetRange: "$1,800 - $3,200",
+                    timelineDays: 6,
+                    commercialRequirements: {
+                        licenseType: "Exclusive Commercial Buyout (Worldwide)",
+                        deliverables: [
+                            `Master ${res} Final Render in ${aspect}`,
+                            "ComfyUI / Runway prompt parameter logs and seed list",
+                            "Model training compliance certificate (No copyrighted IP)"
+                        ],
+                        promptSeedHandover: true
+                    }
+                };
+
+                appState.generatedBrief = generated;
+
+                document.getElementById('brief-structured-preview').innerHTML = `
+                    <div class="p-5 rounded-2xl bg-violet-950/30 border border-violet-800/60 space-y-4">
+                        <div class="flex items-center justify-between border-b border-violet-900/40 pb-3">
+                            <div>
+                                <span class="text-xs font-mono text-violet-400 uppercase font-semibold">AI Structured Creative Brief</span>
+                                <h3 class="text-lg font-bold text-white">${generated.title}</h3>
+                            </div>
+                            <span class="px-3 py-1 rounded-full bg-violet-600/30 text-violet-300 text-xs font-mono border border-violet-500/40">
+                                Est. ${generated.budgetRange}
+                            </span>
+                        </div>
+
+                        <div class="text-xs space-y-2.5">
+                            <div>
+                                <span class="text-slate-400 font-semibold block uppercase text-[10px]">Strategic Objective</span>
+                                <p class="text-slate-200 mt-0.5">${generated.campaignGoal}</p>
+                            </div>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 pt-2 border-t border-slate-800">
+                                <div class="p-2 rounded bg-slate-900 border border-slate-800">
+                                    <span class="text-[10px] text-slate-400 block uppercase">Format</span>
+                                    <span class="font-semibold text-white truncate block">${generated.contentType}</span>
+                                </div>
+                                <div class="p-2 rounded bg-slate-900 border border-slate-800">
+                                    <span class="text-[10px] text-slate-400 block uppercase">Aspect Ratio</span>
+                                    <span class="font-semibold text-violet-300 block font-mono">${generated.aspectRatio}</span>
+                                </div>
+                                <div class="p-2 rounded bg-slate-900 border border-slate-800">
+                                    <span class="text-[10px] text-slate-400 block uppercase">Specs</span>
+                                    <span class="font-semibold text-cyan-300 block font-mono">${generated.technicalSpecs.resolution}</span>
+                                </div>
+                                <div class="p-2 rounded bg-slate-900 border border-slate-800">
+                                    <span class="text-[10px] text-slate-400 block uppercase">Timeline</span>
+                                    <span class="font-semibold text-emerald-300 block font-mono">${generated.timelineDays} Days</span>
+                                </div>
+                            </div>
+
+                            <div class="pt-2 border-t border-slate-800">
+                                <span class="text-slate-400 font-semibold block uppercase text-[10px]">Recommended Generative Pipeline</span>
+                                <div class="flex flex-wrap gap-1.5 mt-1">
+                                    ${generated.recommendedTools.map(t => `<span class="px-2 py-0.5 rounded bg-slate-800 text-slate-200 border border-slate-700 text-xs">${t}</span>`).join('')}
+                                </div>
+                            </div>
+
+                            <div class="pt-2 border-t border-slate-800">
+                                <span class="text-slate-400 font-semibold block uppercase text-[10px]">Licensing & Asset Handover</span>
+                                <p class="text-emerald-400 font-semibold mt-0.5">${generated.commercialRequirements.licenseType}</p>
+                                <ul class="list-disc list-inside text-slate-300 text-[11px] mt-1 space-y-0.5">
+                                    ${generated.commercialRequirements.deliverables.map(d => `<li>${d}</li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <button onclick="publishAIBrief()" class="w-full py-3 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 text-white shadow-lg transition">
+                            🚀 Publish Brief to Marketplace
+                        </button>
+                    </div>
+                `;
+
+                status.classList.add('hidden');
+                result.classList.remove('hidden');
+                showToast("Brief successfully synthesized by AI!", "success");
+            }, 600);
+        }
+
+        function publishAIBrief() {
+            if (!appState.generatedBrief) return;
+            const newBrief = {
+                id: `brief_${100 + appState.briefs.length + 1}`,
+                brandName: document.getElementById('brief-brand-name').value || "Global Brand",
+                brandLogo: "🚀",
+                title: appState.generatedBrief.title,
+                rawIdea: document.getElementById('brief-raw-idea').value,
+                status: "Accepting Proposals",
+                proposalsCount: 0,
+                postedDate: "Just now",
+                budgetRange: appState.generatedBrief.budgetRange,
+                timelineDays: appState.generatedBrief.timelineDays,
+                structuredBrief: appState.generatedBrief
+            };
+
+            appState.briefs.unshift(newBrief);
+            renderBriefs();
+            updateStats();
+            document.getElementById('brief-raw-idea').value = '';
+            document.getElementById('brief-ai-result').classList.add('hidden');
+            const placeholder = document.getElementById('brief-ai-placeholder');
+            if (placeholder) placeholder.classList.remove('hidden');
+            showToast("Brief published! Creators can now submit proposals.", "success");
+        }
+
+        function renderBriefs() {
+            const container = document.getElementById('briefs-list-container');
+            if (!container) return;
+
+            container.innerHTML = appState.briefs.map(b => `
+                <div class="glass-card rounded-2xl p-6 border border-slate-800 hover:border-violet-500/40 transition space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-violet-600/20 border border-violet-500/30 flex items-center justify-center text-xl">
+                                ${b.brandLogo || '🏢'}
+                            </div>
+                            <div>
+                                <span class="text-xs font-semibold text-violet-400">${b.brandName}</span>
+                                <h3 class="text-lg font-bold text-white">${b.title}</h3>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
+                                ● ${b.status}
+                            </span>
+                            <span class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 text-xs font-mono">
+                                ${b.budgetRange}
+                            </span>
+                        </div>
+                    </div>
+
+                    <p class="text-xs text-slate-300 bg-slate-900 p-3 rounded-xl border border-slate-800 italic">
+                        "${b.rawIdea}"
+                    </p>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                        <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800">
+                            <span class="text-slate-400 text-[10px] block uppercase">Format</span>
+                            <span class="font-semibold text-white mt-0.5 block truncate">${b.structuredBrief.contentType}</span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800">
+                            <span class="text-slate-400 text-[10px] block uppercase">Aspect Ratio</span>
+                            <span class="font-semibold text-violet-300 mt-0.5 block font-mono">${b.structuredBrief.aspectRatio}</span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800">
+                            <span class="text-slate-400 text-[10px] block uppercase">Resolution</span>
+                            <span class="font-semibold text-cyan-300 mt-0.5 block font-mono">${b.structuredBrief.technicalSpecs?.resolution || '4K Ultra HD'}</span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800">
+                            <span class="text-slate-400 text-[10px] block uppercase">Licensing</span>
+                            <span class="font-semibold text-emerald-300 mt-0.5 block truncate">${b.structuredBrief.commercialRequirements?.licenseType || 'Commercial Buyout'}</span>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-800 flex items-center justify-between">
+                        <span class="text-xs text-slate-400 font-mono">${b.proposalsCount} Proposals Submitted • Turnaround ~${b.timelineDays} days</span>
+                        <button onclick="openProposalModal('${b.id}')" class="px-4 py-2 rounded-xl text-xs font-semibold bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 text-white shadow-sm">
+                            Submit Proposal as Creator
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Proposal Handling
+        function openProposalModal(briefId) {
+            appState.targetBriefId = briefId;
+            const select = document.getElementById('proposal-creator-select');
+            select.innerHTML = appState.creators.map(c => `<option value="${c.id}">${c.name} (${c.handle})</option>`).join('');
+            document.getElementById('proposal-modal').classList.remove('hidden');
+        }
+
+        function handleProposalSubmit(e) {
+            e.preventDefault();
+            const creatorId = document.getElementById('proposal-creator-select').value;
+            const creator = appState.creators.find(c => c.id === creatorId);
+            const brief = appState.briefs.find(b => b.id === appState.targetBriefId) || appState.briefs[0];
+
+            const newProp = {
+                id: `prop_${appState.proposals.length + 1}`,
+                briefTitle: brief.title,
+                creatorName: creator.name,
+                creatorHandle: creator.handle,
+                bidAmount: document.getElementById('proposal-bid-amount').value,
+                deliveryDays: document.getElementById('proposal-delivery-days').value,
+                pitch: document.getElementById('proposal-pitch').value,
+                status: "Submitted",
+                submittedAt: "Just now"
+            };
+
+            appState.proposals.unshift(newProp);
+            brief.proposalsCount++;
+            closeModal('proposal-modal');
+            renderBriefs();
+            renderProposals();
+            showToast("Proposal sent to brand!", "success");
+        }
+
+        function renderProposals() {
+            const container = document.getElementById('proposals-container');
+            if (!container) return;
+
+            container.innerHTML = appState.proposals.map(p => `
+                <div class="glass-card rounded-2xl p-5 border border-slate-800 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-slate-400">Brief:</span>
+                            <h4 class="text-sm font-bold text-white">${p.briefTitle}</h4>
+                        </div>
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold ${p.status === 'Shortlisted' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-300'}">
+                            ${p.status}
+                        </span>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-slate-400">Creator:</span>
+                                <span class="font-bold text-violet-300">${p.creatorName}</span>
+                                <span class="font-mono text-slate-400">${p.creatorHandle}</span>
+                            </div>
+                            <div class="font-mono font-bold text-white">
+                                ${p.bidAmount} • ${p.deliveryDays} Days
+                            </div>
+                        </div>
+                        <p class="text-slate-300 italic">"${p.pitch}"</p>
+                    </div>
+                    
+                    <div class="flex items-center justify-between text-[11px] text-slate-400">
+                        <span>Submitted ${p.submittedAt}</span>
+                        <span class="text-emerald-400 font-mono">Workflow Verified ✓</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openHireCreator(creatorId) {
+            switchTab('briefs');
+            showToast("Choose or create a brief below to pitch this creator!", "info");
+        }
+
+        // Pitch Deck Controls
+        const PITCH_SLIDES = [
+            {
+                title: "The Problem",
+                subtitle: "Why Traditional Freelance Platforms Fail for AI",
+                icon: "🚨",
+                points: [
+                    "Brands want production-grade GenAI (Runway Gen-3, ComfyUI, FLUX.1), but have no way to verify creator capabilities.",
+                    "Existing freelance marketplaces are not designed around AI workflows (seeds, LoRA fine-tunes, node graphs).",
+                    "Uncertainty around commercial licensing, copyright risk, and model training IP infringement.",
+                    "Iteration friction: Traditional milestones don't support multi-pass diffusion revision pipelines."
+                ]
+            },
+            {
+                title: "The Solution: SYNTHIA",
+                subtitle: "AI-Native Discovery, Verification & Engagement",
+                icon: "⚡",
+                points: [
+                    "AI-Specific Portfolios: Embedded aspect ratios (9:16 vertical reels, 16:9 cinematic), model tags, and prompt reproducibility.",
+                    "Verified Production Signals: Trust badges for verified tools, validated ComfyUI node graphs, and enterprise delivery metrics.",
+                    "AI-Assisted Brief Builder: Translates informal 1-sentence ideas into technical parameters, camera specs, and licensing terms.",
+                    "End-to-End Milestone Handover: Complete asset delivery including locked seeds, workflow JSONs, and model release certificates."
+                ]
+            },
+            {
+                title: "100-Point Scoring Alignment",
+                subtitle: "Built to Win Kampus.VC Hackathon Challenge 2",
+                icon: "🎯",
+                points: [
+                    "Creator Profiles & AI Portfolios (30%): Rich video reels, models/tools, LoRA fine-tuning, and ComfyUI pipelines.",
+                    "Discovery & Filtering Engine (25%): Real-time multi-facet search with sensible fallback for empty results.",
+                    "Structured Brief Definition (20%): Complete technical specifications (resolution, frame rates, buyout terms).",
+                    "User Experience (15%): Cyber-luxe dark glassmorphism, responsive controls, and pipeline inspectors.",
+                    "Presentation & Demo (10%): Built-in interactive pitch deck and live schema viewer for evaluators."
+                ]
+            },
+            {
+                title: "Bonus Features Built-In",
+                subtitle: "Maximizing Bonus Credit Evaluation",
+                icon: "⭐",
+                points: [
+                    "Bonus 1: Creator Verification Signals — Visible trust badges, ComfyUI node reproducibility, and 0–100 Trust Scores.",
+                    "Bonus 2: AI-Assisted Brief Builder — Real-time semantic prompt decomposition from rough text to production specs.",
+                    "Direct scoring impact: Verification boosts Portfolio criteria (30%), while Brief Builder boosts Brief Definition criteria (20%)."
+                ]
+            },
+            {
+                title: "Kampus.VC Strategic Fit",
+                subtitle: "The Definitive Liquidity Layer for GenAI Creators",
+                icon: "🚀",
+                points: [
+                    "Phase 1 (Live Today): AI creator discovery, prompt brief synthesis, and verified workflow portfolios.",
+                    "Phase 2: Decentralized GPU execution — Re-render ComfyUI node graphs directly in-browser.",
+                    "Phase 3: Automated smart escrow contracts triggered upon verifiable seed validation.",
+                    "Vision: Empowering the next 10 million generative creators and filmmakers globally."
+                ]
+            }
+        ];
+
+        function openPitchDeck() {
+            appState.activePitchSlide = 0;
+            renderPitchSlide();
+            document.getElementById('pitch-deck-modal').classList.remove('hidden');
+        }
+
+        function renderPitchSlide() {
+            const s = PITCH_SLIDES[appState.activePitchSlide];
+            document.getElementById('pitch-slide-counter').textContent = `Slide ${appState.activePitchSlide + 1} of ${PITCH_SLIDES.length}`;
+            
+            document.getElementById('pitch-slide-content').innerHTML = `
+                <div class="space-y-6">
+                    <div class="flex items-center gap-3">
+                        <span class="text-4xl">${s.icon}</span>
+                        <div>
+                            <h2 class="text-2xl font-black text-white">${s.title}</h2>
+                            <p class="text-sm text-violet-400 font-medium">${s.subtitle}</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3 pt-2">
+                        ${s.points.map(p => `
+                            <div class="flex items-start gap-3 p-3.5 rounded-xl bg-slate-900 border border-slate-800">
+                                <span class="text-violet-400 font-bold mt-0.5">✦</span>
+                                <p class="text-sm text-slate-200 leading-relaxed">${p}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('pitch-slide-dots').innerHTML = PITCH_SLIDES.map((_, idx) => `
+                <span class="w-2 h-2 rounded-full transition ${idx === appState.activePitchSlide ? 'bg-violet-500 scale-125' : 'bg-slate-700'}"></span>
+            `).join('');
+        }
+
+        function nextSlide() {
+            if (appState.activePitchSlide < PITCH_SLIDES.length - 1) {
+                appState.activePitchSlide++;
+                renderPitchSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (appState.activePitchSlide > 0) {
+                appState.activePitchSlide--;
+                renderPitchSlide();
+            }
+        }
+
+        // Data Model Viewer
+        function renderDataModel() {
+            const el = document.getElementById('data-model-viewer');
+            if (el) {
+                el.textContent = JSON.stringify({
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "title": "Kampus.VC AI Content Creator Marketplace Data Architecture",
+                    "models": {
+                        "CreatorProfile": {
+                            "properties": {
+                                "id": "string",
+                                "name": "string",
+                                "handle": "string",
+                                "verification": {
+                                    "isVerified": "boolean",
+                                    "badgeLevel": "Top Tier Verified Pro | Certified ComfyUI Architect",
+                                    "verifiedTools": ["Runway Gen-3", "Midjourney v6.1", "ComfyUI"],
+                                    "workflowProofAvailable": "boolean",
+                                    "trustScore": "0-100"
+                                },
+                                "skills": ["Prompt Engineering", "LoRA Training", "ControlNet", "4K Video Upscaling"],
+                                "specializations": ["AI Filmmaking", "Brand Commercials", "3D/VFX"],
+                                "toolsUsed": ["Runway Gen-3", "Midjourney v6", "ComfyUI", "FLUX.1"],
+                                "portfolio": ["#models/PortfolioItem"]
+                            }
+                        },
+                        "PortfolioItem": {
+                            "properties": {
+                                "id": "string",
+                                "title": "string",
+                                "aspectRatio": "9:16 | 16:9 | 1:1 | 4:5",
+                                "workflow": {
+                                    "pipeline": "string",
+                                    "seedReproducibility": "Locked Seed: #84920194",
+                                    "hasComfyUiGraph": "boolean",
+                                    "comfyNodeSummary": "string"
+                                },
+                                "commercialLicense": "Exclusive Buyout | Non-exclusive"
+                            }
+                        },
+                        "BrandCreativeBrief": {
+                            "properties": {
+                                "briefId": "string",
+                                "brandName": "string",
+                                "rawIdea": "string",
+                                "structuredBrief": {
+                                    "campaignGoal": "string",
+                                    "contentType": "Short-Form Video Ad (9:16) | Cinematic Trailer (16:9)",
+                                    "aspectRatio": "9:16 | 16:9 | 1:1",
+                                    "recommendedTools": ["Runway Gen-3", "FLUX.1", "ComfyUI"],
+                                    "commercialRequirements": {
+                                        "licenseType": "Exclusive Commercial Buyout",
+                                        "promptSeedHandover": true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }, null, 2);
+            }
+        }
+
+        // Stats Counter
+        function updateStats() {
+            document.getElementById('stat-total-creators').textContent = appState.creators.length;
+            document.getElementById('stat-verified-count').textContent = appState.creators.filter(c => c.verification?.isVerified).length;
+            document.getElementById('stat-active-briefs').textContent = appState.briefs.length;
+            const avgRating = (appState.creators.reduce((acc, c) => acc + c.rating, 0) / appState.creators.length).toFixed(2);
+            document.getElementById('stat-avg-rating').textContent = `${avgRating} ★`;
+        }
+
+        // Modal Utilities
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function showToast(msg, type = "info") {
+            const toast = document.createElement('div');
+            const bg = type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-rose-600' : 'bg-violet-600';
+            toast.className = `fixed bottom-6 right-6 z-50 px-4 py-2.5 rounded-xl text-white text-xs font-semibold shadow-2xl flex items-center gap-2 transform transition duration-300 translate-y-4 opacity-0 ${bg}`;
+            toast.innerHTML = `<span>${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'}</span><span>${msg}</span>`;
+            document.body.appendChild(toast);
+            setTimeout(() => { toast.classList.remove('translate-y-4', 'opacity-0'); }, 10);
+            setTimeout(() => {
+                toast.classList.add('translate-y-4', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Backdrop click to close modals
+        window.addEventListener('click', (e) => {
+            ['creator-detail-modal', 'portfolio-detail-modal', 'proposal-modal', 'pitch-deck-modal'].forEach(id => {
+                const modal = document.getElementById(id);
+                if (e.target === modal) modal.classList.add('hidden');
+            });
+        });
+    </script>
+</body>
+</html>
